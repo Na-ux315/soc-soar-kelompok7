@@ -1,4 +1,4 @@
-# Laporan SOAR
+# SOAR
 
 ---
 type: project-hub
@@ -124,7 +124,9 @@ date_modified: 2026-06-02T08:25
 ---
 
 URL      : https://20.6.107.168
+
 User     : admin
+
 Password : a.fCWIcbgs8Kag+RsZumqrsqVp*wXRd7
 
 ---
