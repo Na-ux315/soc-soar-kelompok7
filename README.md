@@ -1,6 +1,180 @@
-# SOAR
+# Implementasi SIEM dan SOAR untuk Deteksi dan Mitigasi Serangan DDoS
+
+## Anggota Kelompok
+
+| Nama | NRP |
+|--------|--------|
+|Jonathan Zelig Sutopo | 5027241047 |
+| Adiwidya Budi Pratama | 5027241012 |
+| Fika Arka Nuriyah | 5027241071 |
+| Naila Cahyarani Idelia | 5027241063 |
 
 ---
+
+Proyek ini merupakan pengembangan dari infrastruktur SIEM yang telah dibangun pada mata kuliah MIKS dengan menambahkan kemampuan SOAR (Security Orchestration, Automation, and Response).
+
+Sistem dirancang untuk mendeteksi serangan Distributed Denial of Service (DDoS) secara otomatis menggunakan Suricata dan Wazuh, kemudian menjalankan tindakan mitigasi secara otomatis melalui workflow SOAR.
+
+---
+
+## Arsitektur Sistem
+
+```text
+Attacker VM
+     |
+     v
+Victim VM
+(Suricata + Wazuh Agent)
+     |
+     v
+Wazuh Manager
+(SIEM)
+     |
+     v
+Shuffle SOAR
+     |
+     v
+Automated Response
+```
+
+## Komponen Sistem
+
+| Komponen | Fungsi |
+|-----------|---------|
+| Wazuh Manager | Analisis dan korelasi log |
+| Wazuh Agent | Mengirimkan log ke manager |
+| Suricata IDS | Mendeteksi aktivitas jaringan mencurigakan |
+| Shuffle SOAR | Menjalankan workflow otomatis |
+| Attacker VM | Simulasi serangan DDoS |
+| Victim VM | Target serangan |
+
+- wazuh-manager  → Publik: 20.6.107.168   | Privat: 10.0.0.4
+- wazuh-agent1   → Publik: 4.145.83.62    | Privat: 10.0.0.5
+- wazuh-agent2   → Publik: 172.188.9.210  | Privat: 10.0.0.6
+
+URL      : https://20.6.107.168
+
+User     : admin
+
+Password : a.fCWIcbgs8Kag+RsZumqrsqVp*wXRd7
+
+---
+
+## Teknologi yang Digunakan
+
+| Teknologi | Fungsi |
+|-----------|---------|
+| Wazuh | Security Information and Event Management (SIEM) untuk monitoring, analisis, dan korelasi log |
+| Suricata | Intrusion Detection System (IDS) untuk mendeteksi aktivitas jaringan yang mencurigakan dan serangan DDoS |
+| Shuffle | Security Orchestration, Automation, and Response (SOAR) untuk mengotomatisasi workflow respons insiden |
+| Ubuntu Server | Sistem operasi yang digunakan pada seluruh virtual machine |
+| Microsoft Azure | Platform cloud untuk deployment infrastruktur dan virtual machine |
+
+---
+
+## Alur Kerja Sistem
+
+1. Attacker mengirimkan trafik DDoS ke Victim VM.
+2. Suricata mendeteksi pola trafik yang mencurigakan.
+3. Event dikirim ke Wazuh Agent.
+4. Wazuh Manager melakukan korelasi menggunakan custom rule.
+5. Alert DDoS dibuat.
+6. Alert diteruskan ke Shuffle SOAR.
+7. Workflow SOAR dijalankan secara otomatis.
+8. Sistem melakukan mitigasi terhadap sumber serangan.
+
+---
+
+## Implementasi Deteksi DDoS
+
+Beberapa jenis serangan yang diuji:
+
+- 
+- 
+- 
+
+Deteksi dilakukan menggunakan custom rule pada Wazuh yang memanfaatkan parameter:
+
+- 
+- 
+- 
+
+---
+
+## Implementasi SOAR
+
+Platform Shuffle digunakan untuk:
+
+- 
+- 
+- 
+
+---
+
+## Pengujian
+
+- *(Jenis serangan yang diuji)*
+
+```bash
+
+```
+
+- *(Jenis serangan yang diuji)*
+
+```bash
+
+```
+
+- *(Jenis serangan yang diuji)*
+
+```bash
+
+```
+
+---
+
+## Hasil Pengujian
+
+| Pengujian | Hasil |
+|-----------|--------|
+| Integrasi Suricata | Berhasil/Gagal |
+| Integrasi Wazuh | Berhasil/Gagal |
+| Deteksi DDoS | Berhasil/Gagal |
+| Workflow SOAR | Berhasil/Gagal |
+| Mitigasi Otomatis | Berhasil/Gagal |
+
+---
+
+## Dokumentasi
+
+### Topologi Sistem
+
+*(Tambahkan gambar arsitektur di sini)*
+
+### Alert DDoS pada Wazuh
+
+*(Tambahkan screenshot dashboard Wazuh di sini)*
+
+### Workflow Shuffle
+
+*(Tambahkan screenshot workflow Shuffle di sini)*
+
+### Hasil Mitigasi
+
+*(Tambahkan screenshot hasil blocking atau response otomatis di sini)*
+
+---
+
+## Kesimpulan
+
+Integrasi Wazuh SIEM dan Shuffle SOAR berhasil diterapkan untuk mendeteksi serta merespons serangan DDoS secara otomatis. Sistem mampu melakukan monitoring, korelasi log, pembuatan alert, dan mitigasi insiden tanpa intervensi manual sehingga meningkatkan efektivitas proses keamanan siber.
+
+---
+
+# Cybersecurity Infrastructure System
+
+---
+
 type: project-hub
 
 tags:
@@ -14,10 +188,6 @@ repo_url:
 date_created: 2026-05-20T15:33
 
 date_modified: 2026-06-02T08:25
-
----
-
-# Cybersecurity Infrastructure System
 
 ---
 
@@ -120,21 +290,6 @@ date_modified: 2026-06-02T08:25
   </rule>
 </group>
 ```
-
----
-
-URL      : https://20.6.107.168
-
-User     : admin
-
-Password : a.fCWIcbgs8Kag+RsZumqrsqVp*wXRd7
-
----
-
-## Architecture & Environment
-- wazuh-manager  → Publik: 20.6.107.168   | Privat: 10.0.0.4
-- wazuh-agent1   → Publik: 4.145.83.62    | Privat: 10.0.0.5
-- wazuh-agent2   → Publik: 172.188.9.210  | Privat: 10.0.0.6
 
 ---
 
