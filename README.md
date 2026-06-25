@@ -170,22 +170,26 @@ Platform Shuffle digunakan untuk:
 
 ## Pengujian
 
-- *(Jenis serangan yang diuji)*
+- *DDoS*
 
 ```bash
-
+exileerr@LAPTOP-2LK9FGGT:~$ sudo hping3 -S -p 80 --flood 20.244.25.231
+azureuser@wazuh-agent-1:~$ sudo grep "LOCAL DDoS" /var/log/suricata/eve.json | tail -10
+{"timestamp":"2026-06-25T06:28:28.645892+0000","flow_id":1366711734698013,"in_iface":"eth0","event_type":"alert","src_ip":"103.94.191.131","src_port":52462,"dest_ip":"10.1.0.5","dest_port":80,"proto":"TCP","ip_v":4,"pkt_src":"wire/pcap","alert":{"action":"allowed","gid":1,"signature_id":1000001,"rev":1,"signature":"LOCAL DDoS SYN Flood Detected","category":"Attempted Denial of Service","severity":2},"direction":"to_server","flow":{"pkts_toserver":1,"pkts_toclient":0,"bytes_toserver":60,"bytes_toclient":0,"start":"2026-06-25T06:28:28.645892+0000","src_ip":"103.94.191.131","dest_ip":"10.1.0.5","src_port":52462,"dest_port":80}}
 ```
 
-- *(Jenis serangan yang diuji)*
+- *EICAR*
 
 ```bash
-
+azureuser@wazuh-agent-1:~$ sudo grep "1000014" /var/log/suricata/eve.json | tail -5
+{"timestamp":"2026-06-25T06:57:31.440336+0000","flow_id":963485843391353,"in_iface":"eth0","event_type":"alert","src_ip":"103.94.191.131","src_port":42113,"dest_ip":"10.1.0.5","dest_port":80,"proto":"TCP","ip_v":4,"pkt_src":"wire/pcap","alert":{"action":"allowed","gid":1,"signature_id":1000014,"rev":2,"signature":"LOCAL Malware EICAR Test Signature Detected","category":"A Network Trojan was detected","severity":1},"app_proto":"http","direction":"to_server","flow":{"pkts_toserver":4,"pkts_toclient":10,"bytes_toserver":388,"bytes_toclient":11594,"start":"2026-06-25T06:57:31.224329+0000","src_ip":"103.94.191.131","dest_ip":"10.1.0.5","src_port":42113,"dest_port":80}}
 ```
 
-- *(Jenis serangan yang diuji)*
+- *SSH*
 
 ```bash
-
+azureuser@wazuh-agent-1:~$ sudo grep "LOCAL Malware" /var/log/suricata/eve.json | tail -10
+{"timestamp":"2026-06-25T06:33:24.134612+0000","flow_id":1025868332539449,"in_iface":"eth0","event_type":"alert","src_ip":"103.94.191.131","src_port":60873,"dest_ip":"10.1.0.5","dest_port":22,"proto":"TCP","ip_v":4,"pkt_src":"wire/pcap","alert":{"action":"allowed","gid":1,"signature_id":1000010,"rev":1,"signature":"LOCAL Malware Possible SSH Brute Force Attempt","category":"Attempted Administrator Privilege Gain","severity":1},"app_proto":"ssh","direction":"to_server","flow":{"pkts_toserver":12,"pkts_toclient":10,"bytes_toserver":3715,"bytes_toclient":3407,"start":"2026-06-25T06:33:23.304389+0000","src_ip":"103.94.191.131","dest_ip":"10.1.0.5","src_port":60873,"dest_port":22}}
 ```
 
 ---
@@ -194,9 +198,9 @@ Platform Shuffle digunakan untuk:
 
 | Pengujian | Hasil |
 |-----------|--------|
-| Integrasi Suricata | Berhasil/Gagal |
-| Integrasi Wazuh | Berhasil/Gagal |
-| Deteksi DDoS | Berhasil/Gagal |
+| Integrasi Suricata | Berhasil |
+| Integrasi Wazuh | Berhasil |
+| Deteksi DDoS | Berhasil |
 | Workflow SOAR | Berhasil/Gagal |
 | Mitigasi Otomatis | Berhasil/Gagal |
 
@@ -209,8 +213,11 @@ Platform Shuffle digunakan untuk:
 *(Tambahkan gambar arsitektur di sini)*
 
 ### Alert DDoS pada Wazuh
+<img width="933" height="413" alt="image" src="https://github.com/user-attachments/assets/d7488504-dcb9-4f07-ba8c-8ad48fea7833" />
+<img width="931" height="404" alt="image" src="https://github.com/user-attachments/assets/9eefce0f-c9f1-4ddf-8ef6-438af3ab42b9" />
+<img width="459" height="408" alt="image" src="https://github.com/user-attachments/assets/5bf18f2c-db69-4cc1-a65e-91ffea79b999" />
+<img width="945" height="413" alt="image" src="https://github.com/user-attachments/assets/891ef9b4-a09d-486d-b155-2286fe3af69f" />
 
-*(Tambahkan screenshot dashboard Wazuh di sini)*
 
 ### Workflow Shuffle
 
