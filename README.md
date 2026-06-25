@@ -85,19 +85,79 @@ Password : a.fCWIcbgs8Kag+RsZumqrsqVp*wXRd7
 
 ---
 
-## Implementasi Deteksi DDoS
+## Arsitektur Deteksi
 
-Beberapa jenis serangan yang diuji:
+```
+Attacker (Local Machine / Kali WSL2)
+        |
+        v
+Victim VM (20.244.25.231 | Privat: 10.1.0.5)
+  - Suricata IDS (custom rules + et/open ruleset)
+  - Apache2 (attack surface port 80)
+  - OpenSSH (attack surface port 22)
+  - Wazuh Agent (forward eve.json ke Manager)
+        |
+        v
+Wazuh Manager (20.244.11.27 | Privat: 10.1.0.4)
+  - Decode & korelasi alert Suricata
+  - Simpan ke Wazuh Indexer (OpenSearch)
+  - Visualisasi di Wazuh Dashboard
+```
 
-- 
-- 
-- 
+## Komponen Sistem
 
-Deteksi dilakukan menggunakan custom rule pada Wazuh yang memanfaatkan parameter:
+| Komponen | Fungsi |
+|---|---|
+| Wazuh Manager | Decode, korelasi, dan penyimpanan log/alert |
+| Wazuh Agent | Membaca eve.json Suricata, forward ke Manager |
+| Suricata IDS | Deteksi pola serangan jaringan via custom rules |
+| Victim VM | Target simulasi serangan (Apache2, OpenSSH) |
+| Attacker (Local) | Sumber simulasi serangan (hping3 via WSL2) |
 
-- 
-- 
-- 
+**Versi:** Wazuh Manager & Agent v4.14.5 (rc1), Suricata 8.0.5
+
+## Custom Rules Suricata — Kriteria Deteksi
+
+Rules didefinisikan secara independen di `/var/lib/suricata/rules/local.rules` pada Victim VM, terdaftar di `suricata.yaml` terpisah dari ruleset bawaan (`et/open`) agar tidak tertimpa saat `suricata-update` dijalankan ulang.
+
+### Kategori DDoS
+
+| SID | Nama Signature | Kriteria Deteksi |
+|---|---|---|
+| 1000001 | LOCAL DDoS SYN Flood Detected | ≥50 paket SYN dari source IP yang sama dalam 10 detik, ke port manapun |
+| 1000002 | LOCAL DDoS SYN Flood to Service Port | ≥30 paket SYN dari source IP yang sama dalam 10 detik, ke port 22/80/21 |
+| 1000003 | LOCAL DDoS HTTP Flood Detected | ≥100 HTTP request dari source IP yang sama dalam 10 detik ke port 80 |
+| 1000004 | LOCAL DDoS ICMP Flood Detected | ≥50 ICMP echo request dari source IP yang sama dalam 10 detik |
+| 1000005 | LOCAL DDoS UDP Flood Detected | ≥100 paket UDP dari source IP yang sama dalam 10 detik |
+| 1000006 | LOCAL DDoS Possible Slowloris | ≥80 koneksi TCP established ke port 80 dari source IP yang sama dalam 30 detik |
+
+### Kategori Malware
+
+| SID | Nama Signature | Kriteria Deteksi |
+|---|---|---|
+| 1000010 | LOCAL Malware Possible SSH Brute Force Attempt | ≥10 percobaan koneksi ke port 22 dari source IP yang sama dalam 30 detik |
+| 1000011 | LOCAL Malware Possible Metasploit Reverse Shell Outbound | Koneksi outbound dari Victim ke port 4444 (default Metasploit handler) |
+| 1000012 | LOCAL Malware Suspicious Outbound to Common Reverse Shell Port | Koneksi outbound ke port 1337/4445/8443/9001 |
+| 1000013 | LOCAL Malware Possible FTP Brute Force/Exploit Attempt | ≥10 percobaan koneksi ke port 21 dari source IP yang sama dalam 30 detik |
+| 1000014 | LOCAL Malware EICAR Test Signature Detected | Payload mengandung substring `EICAR-STANDARD-ANTIVIRUS-TEST-FILE` |
+| 1000015 / 1000016 | LOCAL Malware Suspicious Scanner User-Agent | User-Agent HTTP mengandung kata "Metasploit" atau "Nikto" |
+
+**Catatan rasional threshold:** Nilai ambang (50 paket/10 detik, 100 request/10 detik, dst.) ditentukan berdasarkan asumsi bahwa traffic normal pengguna tunggal tidak akan menghasilkan volume sebesar itu dalam rentang waktu singkat, sementara automated flood tools (hping3, dsb.) secara konsisten melampauinya. Nilai ini dapat dikalibrasi lebih lanjut berdasarkan baseline traffic normal sistem.
+
+## Hasil Pengujian
+
+Pengujian dilakukan dari local attacker machine (WSL2 Ubuntu, tool `hping3` versi 3.0.0-alpha-2) menuju Victim VM publik (20.244.25.231).
+
+| Pengujian | Tool/Method | SID Ter-trigger | Status | Catatan |
+|---|---|---|---|---|
+| SYN Flood | `hping3 -S -p 80 --flood` | 1000001, 1000002 | ✅ Berhasil | 118.624 paket terkirim; alert tercatat hingga ke Wazuh Manager (331 hits) |
+| SSH Brute Force | Loop SSH connection (15x) | 1000010 | ✅ Berhasil | 10 alert tercatat dalam window ~6 detik |
+| EICAR Test Signature | `curl` GET request | 1000014 | ✅ Berhasil (setelah revisi) | Percobaan awal dengan string penuh (68 karakter) gagal karena koneksi ter-reset sebelum payload lengkap terkirim; rule disederhanakan menjadi substring unik yang lebih singkat (`rev:2`) dan berhasil terdeteksi |
+| HTTP Flood | — | 1000003 | ⏳ Belum diuji | Menunggu pengujian lanjutan setelah Apache2 terinstall |
+| Reverse Shell Port | — | 1000011, 1000012 | ⏳ Belum diuji | Membutuhkan skenario Metasploit/msfvenom penuh |
+| FTP Brute Force | — | 1000013 | ⏳ Belum diuji | Membutuhkan instalasi Vsftpd |
+
+
 
 ---
 
