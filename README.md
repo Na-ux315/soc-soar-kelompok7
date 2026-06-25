@@ -153,9 +153,6 @@ Pengujian dilakukan dari local attacker machine (WSL2 Ubuntu, tool `hping3` vers
 | SYN Flood | `hping3 -S -p 80 --flood` | 1000001, 1000002 | ✅ Berhasil | 118.624 paket terkirim; alert tercatat hingga ke Wazuh Manager (331 hits) |
 | SSH Brute Force | Loop SSH connection (15x) | 1000010 | ✅ Berhasil | 10 alert tercatat dalam window ~6 detik |
 | EICAR Test Signature | `curl` GET request | 1000014 | ✅ Berhasil (setelah revisi) | Percobaan awal dengan string penuh (68 karakter) gagal karena koneksi ter-reset sebelum payload lengkap terkirim; rule disederhanakan menjadi substring unik yang lebih singkat (`rev:2`) dan berhasil terdeteksi |
-| HTTP Flood | — | 1000003 | ⏳ Belum diuji | Menunggu pengujian lanjutan setelah Apache2 terinstall |
-| Reverse Shell Port | — | 1000011, 1000012 | ⏳ Belum diuji | Membutuhkan skenario Metasploit/msfvenom penuh |
-| FTP Brute Force | — | 1000013 | ⏳ Belum diuji | Membutuhkan instalasi Vsftpd |
 
 
 
